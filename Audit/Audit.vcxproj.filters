@@ -34,5 +34,8 @@
     <EmbeddedResource Include="Log.resx">
       <Filter>Файлы ресурсов</Filter>
     </EmbeddedResource>
+    <EmbeddedResource Include="LogReg.resx">
+      <Filter>Файлы ресурсов</Filter>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

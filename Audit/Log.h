@@ -5,13 +5,16 @@
 namespace Audit {
 
 	using namespace System;
+	using namespace System::Linq::Expressions;
 	using namespace System::ComponentModel;
 	using namespace System::Collections;
+	using namespace System::Collections::Generic;
 	using namespace System::Windows::Forms;
 	using namespace System::Data;
 	using namespace System::Drawing;
 	using namespace System::IO;
 	using namespace System::Diagnostics;
+	
 
 
 	/// <summary>
@@ -29,9 +32,7 @@ namespace Audit {
 		DateTime gtime;
 	private: System::Windows::Forms::PictureBox^  pictureBox_Camera;
 	public:
-
-	public:
-		array<Process^>^ prlist;
+		List<String^>^ gprlist;
 	protected:
 		/// <summary>
 		/// Освободить все используемые ресурсы.
@@ -128,9 +129,16 @@ namespace Audit {
 
 		}
 #pragma endregion
+	private: List<String^>^ ToList(array<Process^>^ prarray) {
+		List<String^>^ prlist = gcnew List<String^>();
+		for each (Process^ process in prarray) {
+			prlist->Add(process->ProcessName);
+		}
+		return prlist;
+	}
 	private: System::Void Log_Load(System::Object^  sender, System::EventArgs^  e) {
 		button_Pause->Enabled = false;
-		prlist = Process::GetProcesses();
+		gprlist = ToList(Process::GetProcesses());
 		gtime = DateTime::Now;
 		WriteTotxt(Environment::NewLine);
 		WriteTotxt(String::Format("[{0}] ({1} logged in) ", gtime.ToString("MM\/dd\/yyyy HH:mm"), username));
@@ -178,6 +186,14 @@ namespace Audit {
 				buffer += Enum::GetName(Keys::typeid, i);
 				buffer += " ";
 			}
+		}
+		
+		List<String^>^ prlist = ToList(Process::GetProcesses());
+		List<String^>^ diff = gcnew List<String^>(System::Linq::Enumerable::Except(prlist, gprlist));
+		if (diff->Count !=0) {
+			buffer += TimeStamp();
+			buffer += String::Format("({0} opened) ",String::Join(" opened) (",diff));
+			gprlist = prlist;
 		}
 		WriteTotxt(buffer);
 	}
