@@ -1,0 +1,6 @@
+everyone,Solitaire
+User1,calc
+User2,ultradefrag
+User2,calc
+User2,qbittorrent
+User3,calc

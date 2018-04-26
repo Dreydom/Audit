@@ -24,7 +24,8 @@ namespace Audit {
 			//TODO: добавьте код конструктора
 			//
 		}
-
+	public:
+		static String^ LogPath = System::IO::Directory::GetCurrentDirectory() + "\\";
 	protected:
 		/// <summary>
 		/// Освободить все используемые ресурсы.
@@ -174,9 +175,11 @@ namespace Audit {
 					
 				}
 				else {
-					Log^ log = gcnew Log(textBox_Username->Text);
+					Log^ log = gcnew Log(textBox_Username->Text, LogPath);
+					log->Owner = this;
 					this->Hide();
 					log->ShowDialog();
+					LogPath = log->logpath;
 					this->Show();
 					return;
 				}
@@ -187,7 +190,12 @@ namespace Audit {
 		
 	}
 	private: System::Void button_Register_Click(System::Object^  sender, System::EventArgs^  e) {
-		for each (String^ line in File::ReadLines("users.txt"))
+		if (textBox_Username->Text == "everyone") {
+			MessageBox::Show(this, "Username ""everyone"" is not allowed", "Error", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+			return;
+		}
+		List<String^>^ lines = gcnew List<String^>(File::ReadLines("users.txt"));
+		for each (String^ line in lines)
 		{
 			if (line->Contains(textBox_Username->Text))
 			{
@@ -199,9 +207,11 @@ namespace Audit {
 			Environment::NewLine,
 			textBox_Username->Text,
 			getMD5String(textBox_Password->Text)));
-		Log^ log = gcnew Log(textBox_Username->Text);
+		Log^ log = gcnew Log(textBox_Username->Text, LogPath);
+		log->Owner = this;
 		this->Hide();
 		log->ShowDialog();
+		LogPath = log->logpath;
 		this->Show();
 		return;
 	}
